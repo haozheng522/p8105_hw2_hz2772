@@ -95,3 +95,35 @@ skimr::skim(une_df)
 **The unemployment data** has 816 rows and 3 columns, with 3 variables named month, year and une_data. The values are from each year and each month from 1948 to 2015. Like the unemployment value in May of 1998 is `r une_df %>% filter(year==1998,month=="May") %>% pull(une_data)`.
 
 
+**Problem 3**
+```{r, message = FALSE, warning=FALSE}
+pbn_df = read_csv("data/Popular_Baby_Names.csv") 
+pbn_df = pbn_df[!duplicated(pbn_df),] %>%
+  janitor::clean_names() %>%
+  ## find some ethnicity categories changed
+  mutate(ethnicity=replace(ethnicity,ethnicity=="ASIAN AND PACI","ASIAN AND PACIFIC ISLANDER")) %>%
+  mutate(ethnicity=replace(ethnicity,ethnicity=="BLACK NON HISP","BLACK NON HISPANIC")) %>%
+  mutate(ethnicity=replace(ethnicity,ethnicity=="WHITE NON HISP","WHITE NON HISPANIC")) 
+         
+
+olv_df = filter(pbn_df,childs_first_name=="Olivia",gender=="FEMALE") %>%
+  select(-gender,-childs_first_name,-count) %>%
+  pivot_wider(names_from = "year_of_birth",
+              values_from = "rank")
+olv_df
+
+pop_male_df = filter(pbn_df,gender=="MALE",rank==1) %>%
+  select(-gender,-count,-rank) %>%
+  pivot_wider(names_from = "year_of_birth",
+              values_from = "childs_first_name")
+
+plot_df = filter(pbn_df,year_of_birth==2016,gender=="MALE",ethnicity=="WHITE NON HISPANIC") 
+pop_male_df
+
+ggplot(plot_df,aes(x=rank,y=count)) + 
+  geom_point(alpha=.5,color=rainbow(length(rank)))+
+  ggtitle("Numbers of 2016 Rank Popular Male Name")+
+  theme_pander()
+```
+
+
