@@ -207,6 +207,38 @@ skimr::skim(trash_data)
 skimr::skim(precip_data)</code></pre>
 <p>The <strong>“Trash-Wheel”</strong> dataframe has 454 rows and 14 columns which are 14 variables named dumpster, month, year and etc. Like the number of glass bottles in the dumpster 1 in May is 72. The <strong>median number of sports balls in dumpster of 2019</strong> is 9.</p>
 <p>The <strong>precipitation</strong> dataframe of 2018 and 2019 has 12 rows and 3 columns which are 3 variables named month, 2018 and 2019. The values are precipitation data of each month. Like the precipitation data in May of 2018 is 9.27. The <strong>total precipitation of 2018</strong> is 70.33.</p>
+<p><strong>Problem2</strong></p>
+<pre class="r"><code>pm_df = read.csv(&quot;data/fivethirtyeight_datasets/pols-month.csv&quot;) %&gt;%
+  separate(col=mon,into = c(&quot;year&quot;,&quot;month&quot;,&quot;day&quot;),sep = &quot;-&quot;) %&gt;%
+  mutate(month=replace(month,month==c(&quot;01&quot;,&quot;02&quot;,&quot;03&quot;,&quot;04&quot;,&quot;05&quot;,&quot;06&quot;,&quot;07&quot;,&quot;08&quot;,&quot;09&quot;,&quot;10&quot;,&quot;11&quot;,&quot;12&quot;),month.name)) %&gt;%
+  mutate(president=prez_gop+prez_dem) %&gt;%
+  select(-prez_dem)  %&gt;%
+  select(-prez_gop)  %&gt;%
+  select(-day) %&gt;%
+  mutate(year=as.integer(year))
+
+snp_df = read.csv(&quot;data/fivethirtyeight_datasets/snp.csv&quot;) %&gt;%
+  separate(col=date,into = c(&quot;month&quot;,&quot;day&quot;,&quot;year&quot;),sep = &quot;/&quot;) %&gt;%
+  mutate(month = month.name[as.integer(month)]) %&gt;%
+  select(year,month,everything()) %&gt;%
+  mutate(year = ifelse(as.integer(year)&gt;=50,as.integer(year)+1900,as.integer(year)+2000)) 
+
+une_df = read.csv(&quot;data/fivethirtyeight_datasets/unemployment.csv&quot;) %&gt;%
+  pivot_longer(Jan:Dec,
+               names_to=&quot;month&quot;,
+               values_to=&quot;une_data&quot;) %&gt;%
+  rename(year=Year) %&gt;%
+  mutate(month=replace(month,month==month.abb,month.name))
+
+mer_df = merge(x=snp_df,y=pm_df,by=c(&quot;year&quot;,&quot;month&quot;),all.y = TRUE) 
+mer_df = merge(x=une_df,y=mer_df,by.x=c(&quot;year&quot;,&quot;month&quot;),all.y = TRUE)
+
+skimr::skim(pm_df)
+skimr::skim(snp_df)
+skimr::skim(une_df)</code></pre>
+<p><strong>The pols-month data</strong> has 822 rows and 9 columns, with 9 variables named month, year, gov_gop and etc. The values are from each year and each month from 1947 to 2015. Like the gov_gop value in May of 1998 is 32.</p>
+<p><strong>The snp data</strong> has 787 rows and 4 columns, with 4 variables named month, day, year and close. The values are from each year and each month from 1950 to 2015. Like the close value in May of 1998 is 1090.819946.</p>
+<p><strong>The unemployment data</strong> has 816 rows and 3 columns, with 3 variables named month, year and une_data. The values are from each year and each month from 1948 to 2015. Like the unemployment value in May of 1998 is 4.4.</p>
 
 
 

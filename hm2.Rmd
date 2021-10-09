@@ -55,3 +55,43 @@ The **"Trash-Wheel"** dataframe has 454  rows and 14 columns which are 14 variab
 The **precipitation** dataframe of 2018 and 2019 has 12 rows and 3 columns which are 3 variables named month, 2018 and 2019. The values are precipitation data of each month. Like the precipitation data in May of 2018 is `r precip_data %>% filter(month=="May") %>% pull("2018")`. The **total precipitation of 2018** is `r sum(select(precip_data,"2018"))`.
 
 
+**Problem2**
+```{r, message = FALSE, warning=FALSE, results='hide'}
+pm_df = read.csv("data/fivethirtyeight_datasets/pols-month.csv") %>%
+  separate(col=mon,into = c("year","month","day"),sep = "-") %>%
+  mutate(month=replace(month,month==c("01","02","03","04","05","06","07","08","09","10","11","12"),month.name)) %>%
+  mutate(president=prez_gop+prez_dem) %>%
+  select(-prez_dem)  %>%
+  select(-prez_gop)  %>%
+  select(-day) %>%
+  mutate(year=as.integer(year))
+
+snp_df = read.csv("data/fivethirtyeight_datasets/snp.csv") %>%
+  separate(col=date,into = c("month","day","year"),sep = "/") %>%
+  mutate(month = month.name[as.integer(month)]) %>%
+  select(year,month,everything()) %>%
+  mutate(year = ifelse(as.integer(year)>=50,as.integer(year)+1900,as.integer(year)+2000)) 
+
+une_df = read.csv("data/fivethirtyeight_datasets/unemployment.csv") %>%
+  pivot_longer(Jan:Dec,
+               names_to="month",
+               values_to="une_data") %>%
+  rename(year=Year) %>%
+  mutate(month=replace(month,month==month.abb,month.name))
+
+mer_df = merge(x=snp_df,y=pm_df,by=c("year","month"),all.y = TRUE) 
+mer_df = merge(x=une_df,y=mer_df,by.x=c("year","month"),all.y = TRUE)
+
+skimr::skim(pm_df)
+skimr::skim(snp_df)
+skimr::skim(une_df)
+```
+**The pols-month data** has 822 rows and 9 columns, with 9 variables named month, year, gov_gop and etc. The values are from each year and each month from 1947 to 2015. Like the gov_gop value in May of 1998 is `r pm_df %>% filter(year==1998,month=="May") %>% pull(gov_gop)`.
+
+
+**The snp data** has 787 rows and 4 columns, with 4 variables named month, day, year and close. The values are from each year and each month from 1950 to 2015. Like the close value in May of 1998 is `r snp_df %>% filter(year==1998,month=="May") %>% pull(close)`.
+
+
+**The unemployment data** has 816 rows and 3 columns, with 3 variables named month, year and une_data. The values are from each year and each month from 1948 to 2015. Like the unemployment value in May of 1998 is `r une_df %>% filter(year==1998,month=="May") %>% pull(une_data)`.
+
+
