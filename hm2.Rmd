@@ -1,0 +1,57 @@
+---
+title: "hw2"
+author: "Hao Zheng(hz2772)"
+date: "10/3/2021"
+output: html_document
+---
+
+```{r, echo = FALSE, message = FALSE}
+library(tidyverse)
+library(readxl)
+library(tidyr)
+library(ggplot2)
+library(ggthemes)
+```
+
+**Problem 1**
+```{r, message = FALSE, results='hide'}
+trash_data = 
+  read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+             sheet = "Mr. Trash Wheel"
+             ) %>%
+  janitor::clean_names() %>%
+  select(dumpster:homes_powered) %>%
+  drop_na(dumpster) %>%
+  mutate(sports_balls=round(sports_balls))
+
+precip18_data = 
+  read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+             sheet = "2018 Precipitation",
+             range = "A2:B14") %>%
+  janitor::clean_names() %>%
+  tidyr::drop_na(total) %>%
+  mutate(year = 2018)
+
+precip19_data = 
+  read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
+             sheet = "2019 Precipitation",
+             range = "A2:B14") %>%
+  janitor::clean_names() %>%
+  tidyr::drop_na(total) %>%
+  mutate(year = 2019) 
+
+precip_data = 
+  union(precip18_data,precip19_data) %>%
+  pivot_wider(names_from = "year",
+              values_from = "total") %>%
+  mutate(month=month.name)
+## description
+skimr::skim(trash_data)
+skimr::skim(precip_data)
+```
+The **"Trash-Wheel"** dataframe has 454  rows and 14 columns which are 14 variables named dumpster, month, year and etc. Like the number of glass bottles in the dumpster 1 in May is `r trash_data %>% filter(dumpster==1 & month=="May") %>% pull(glass_bottles)`. The **median number of sports balls in dumpster of 2019** is `r median(trash_data %>% filter(year==2019) %>% pull(sports_balls))`.
+
+
+The **precipitation** dataframe of 2018 and 2019 has 12 rows and 3 columns which are 3 variables named month, 2018 and 2019. The values are precipitation data of each month. Like the precipitation data in May of 2018 is `r precip_data %>% filter(month=="May") %>% pull("2018")`. The **total precipitation of 2018** is `r sum(select(precip_data,"2018"))`.
+
+
