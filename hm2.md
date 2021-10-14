@@ -1,20 +1,11 @@
----
-title: "hw2"
-author: "Hao Zheng(hz2772)"
-date: "10/3/2021"
-output: github_document
----
-
-```{r, echo = FALSE, message = FALSE}
-library(tidyverse)
-library(readxl)
-library(tidyr)
-library(ggplot2)
-library(ggthemes)
-```
+hw2
+================
+Hao Zheng(hz2772)
+10/3/2021
 
 **Problem 1**
-```{r, message = FALSE, results='hide'}
+
+``` r
 trash_data = 
   read_excel("data/Trash-Wheel-Collection-Totals-7-2020-2.xlsx",
              sheet = "Mr. Trash Wheel"
@@ -49,14 +40,20 @@ precip_data =
 skimr::skim(trash_data)
 skimr::skim(precip_data)
 ```
-The **"Trash-Wheel"** dataframe has 454  rows and 14 columns which are 14 variables named dumpster, month, year and etc. Like the number of glass bottles in the dumpster 1 in May is `r trash_data %>% filter(dumpster==1 & month=="May") %>% pull(glass_bottles)`. The **median number of sports balls in dumpster of 2019** is `r median(trash_data %>% filter(year==2019) %>% pull(sports_balls))`.
 
+The **“Trash-Wheel”** dataframe has 454 rows and 14 columns which are 14
+variables named dumpster, month, year and etc. Like the number of glass
+bottles in the dumpster 1 in May is 72. The **median number of sports
+balls in dumpster of 2019** is 9.
 
-The **precipitation** dataframe of 2018 and 2019 has 12 rows and 3 columns which are 3 variables named month, 2018 and 2019. The values are precipitation data of each month. Like the precipitation data in May of 2018 is `r precip_data %>% filter(month=="May") %>% pull("2018")`. The **total precipitation of 2018** is `r sum(select(precip_data,"2018"))`.
-
+The **precipitation** dataframe of 2018 and 2019 has 12 rows and 3
+columns which are 3 variables named month, 2018 and 2019. The values are
+precipitation data of each month. Like the precipitation data in May of
+2018 is 9.27. The **total precipitation of 2018** is 70.33.
 
 **Problem2**
-```{r, message = FALSE, warning=FALSE, results='hide'}
+
+``` r
 pm_df = read.csv("data/fivethirtyeight_datasets/pols-month.csv") %>%
   separate(col=mon,into = c("year","month","day"),sep = "-") %>%
   mutate(month=replace(month,month==c("01","02","03","04","05","06","07","08","09","10","11","12"),month.name)) %>%
@@ -86,17 +83,24 @@ skimr::skim(pm_df)
 skimr::skim(snp_df)
 skimr::skim(une_df)
 ```
-**The pols-month data** has 822 rows and 9 columns, with 9 variables named month, year, gov_gop and etc. The values are from each year and each month from 1947 to 2015. Like the gov_gop value in May of 1998 is `r pm_df %>% filter(year==1998,month=="May") %>% pull(gov_gop)`.
 
+**The pols-month data** has 822 rows and 9 columns, with 9 variables
+named month, year, gov\_gop and etc. The values are from each year and
+each month from 1947 to 2015. Like the gov\_gop value in May of 1998 is
+32.
 
-**The snp data** has 787 rows and 4 columns, with 4 variables named month, day, year and close. The values are from each year and each month from 1950 to 2015. Like the close value in May of 1998 is `r snp_df %>% filter(year==1998,month=="May") %>% pull(close)`.
+**The snp data** has 787 rows and 4 columns, with 4 variables named
+month, day, year and close. The values are from each year and each month
+from 1950 to 2015. Like the close value in May of 1998 is 1090.819946.
 
-
-**The unemployment data** has 816 rows and 3 columns, with 3 variables named month, year and une_data. The values are from each year and each month from 1948 to 2015. Like the unemployment value in May of 1998 is `r une_df %>% filter(year==1998,month=="May") %>% pull(une_data)`.
-
+**The unemployment data** has 816 rows and 3 columns, with 3 variables
+named month, year and une\_data. The values are from each year and each
+month from 1948 to 2015. Like the unemployment value in May of 1998 is
+4.4.
 
 **Problem 3**
-```{r, message = FALSE, warning=FALSE}
+
+``` r
 pbn_df = read_csv("data/Popular_Baby_Names.csv") 
 pbn_df = pbn_df[!duplicated(pbn_df),] %>%
   janitor::clean_names() %>%
@@ -111,7 +115,17 @@ olv_df = filter(pbn_df,childs_first_name=="Olivia",gender=="FEMALE") %>%
   pivot_wider(names_from = "year_of_birth",
               values_from = "rank")
 olv_df
+```
 
+    ## # A tibble: 4 × 5
+    ##   ethnicity                  `2016` `2015` `2014` `2013`
+    ##   <chr>                       <dbl>  <dbl>  <dbl>  <dbl>
+    ## 1 ASIAN AND PACIFIC ISLANDER      1      1      1      3
+    ## 2 BLACK NON HISPANIC              8      4      8      6
+    ## 3 HISPANIC                       13     16     16     22
+    ## 4 WHITE NON HISPANIC              1      1      1      1
+
+``` r
 pop_male_df = filter(pbn_df,gender=="MALE",rank==1) %>%
   select(-gender,-count,-rank) %>%
   pivot_wider(names_from = "year_of_birth",
@@ -119,11 +133,21 @@ pop_male_df = filter(pbn_df,gender=="MALE",rank==1) %>%
 
 plot_df = filter(pbn_df,year_of_birth==2016,gender=="MALE",ethnicity=="WHITE NON HISPANIC") 
 pop_male_df
+```
 
+    ## # A tibble: 4 × 7
+    ##   ethnicity                  `2016` `2015` `2014` `2013` `2012` `2011` 
+    ##   <chr>                      <chr>  <chr>  <chr>  <chr>  <chr>  <chr>  
+    ## 1 ASIAN AND PACIFIC ISLANDER Ethan  Jayden Jayden Jayden RYAN   ETHAN  
+    ## 2 BLACK NON HISPANIC         Noah   Noah   Ethan  Ethan  JAYDEN JAYDEN 
+    ## 3 HISPANIC                   Liam   Liam   Liam   Jayden JAYDEN JAYDEN 
+    ## 4 WHITE NON HISPANIC         Joseph David  Joseph David  JOSEPH MICHAEL
+
+``` r
 ggplot(plot_df,aes(x=rank,y=count)) + 
   geom_point(alpha=.5,color=rainbow(length(rank)))+
   ggtitle("Numbers of 2016 Rank Popular Male Name")+
   theme_pander()
 ```
 
-
+![](hm2_files/figure-gfm/unnamed-chunk-4-1.png)<!-- -->
